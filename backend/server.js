@@ -191,7 +191,7 @@ io.on('connection', (socket) => {
   });
 });
 
-if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+if (!process.env.VERCEL) {
   server.listen(PORT, () => {
     console.log(`BudgetFit Tutorial Backend Server running on http://localhost:${PORT}`);
   });
