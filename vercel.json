@@ -4,7 +4,7 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "/api"
+      "destination": "https://budgetfit-tutorial-backend.onrender.com/api/$1"
     }
   ]
 }
