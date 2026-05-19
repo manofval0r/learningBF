@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { History, GitCommit, AlertTriangle, ShieldAlert, CheckCircle, Split, Sparkles } from 'lucide-react';
+import { History, GitCommit, AlertTriangle, ShieldAlert, CheckCircle, Split, Sparkles, BookOpen } from 'lucide-react';
 
 export default function ProjectHistory({ annotations }) {
   const historyData = annotations?.projectHistory || null;
@@ -11,6 +10,35 @@ export default function ProjectHistory({ annotations }) {
       </div>
     );
   }
+
+  // Curated OOP & Java concepts applied in the project
+  const javaConcepts = [
+    {
+      concept: "Inheritance & Polymorphism",
+      explanation: "Creating parent-child class relationships to reuse layout structures and define generic interfaces for UI components.",
+      example: "UI controllers (e.g. AtmController) implement JavaFX's Initializable interface, allowing the navigation framework to initialize them polymorphically. Custom errors extend the base Exception class."
+    },
+    {
+      concept: "Exception Handling (Try-Catch-Finally)",
+      explanation: "Intercepting run-time exceptions (e.g. database locks or missing files) gracefully to prevent application crashes.",
+      example: "Surrounding JDBC statements with try-catch blocks to capture SQLException, displaying user-friendly JavaFX Alert modals, and using try-with-resources to automatically close connections."
+    },
+    {
+      concept: "The Singleton Design Pattern",
+      explanation: "Enforcing that a class has exactly one active instance in the application memory and providing a global access point.",
+      example: "DashboardController maintains a static instance field and exposing DashboardController.getInstance() so that child views (like AtmController) can trigger main view refreshes."
+    },
+    {
+      concept: "Encapsulation & Scope Accessors",
+      explanation: "Restricting direct access to an object's internal data fields to protect state integrity, using private scopes.",
+      example: "Data models like TransactionEntry hide fields behind private access modifiers, exposing changes exclusively via public getters (getActualAmount()) and setters (setPaid())."
+    },
+    {
+      concept: "Static Modifiers vs. Object Instances",
+      explanation: "Decoupling utility functions from object state. Static methods attach to the class blueprint rather than memory instances.",
+      example: "DataAccessObjects like UserDAO use static helper methods (UserDAO.verifyPin()) since they are stateless, whereas BudgetService must be instantiated as an object to calculate specific users' stream states."
+    }
+  ];
 
   return (
     <div className="py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16 bg-inkBlack">
@@ -133,6 +161,32 @@ export default function ProjectHistory({ annotations }) {
                 </div>
               </div>
 
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Core Java Concepts Applied Study Guide */}
+      <div className="space-y-8 max-w-5xl mx-auto">
+        <div className="flex items-center gap-3 px-4">
+          <BookOpen className="w-5 h-5 text-emeraldAccent" />
+          <h3 className="text-xl font-mono font-medium text-alabaster">Core Java Concepts Applied</h3>
+        </div>
+
+        <div className="grid grid-cols-1 gap-6">
+          {javaConcepts.map((item, idx) => (
+            <div key={idx} className="bg-[#0a1520] p-8 rounded border border-lavender/20 hover:border-emeraldAccent/40 transition-colors space-y-4 shadow-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-lavender/20 pb-2">
+                <h4 className="text-base font-mono font-medium text-alabaster">{item.concept}</h4>
+                <span className="text-[10px] font-mono text-emeraldAccent bg-emeraldAccent/10 px-2 py-0.5 rounded border border-emeraldAccent/20">OOP Concept</span>
+              </div>
+              <p className="text-xs text-lavender font-mono leading-relaxed">
+                {item.explanation}
+              </p>
+              <div className="p-4 rounded bg-inkBlack border border-lavender/10 font-mono text-xs text-alabaster/80 space-y-1 shadow-inner">
+                <div className="text-emeraldAccent uppercase tracking-wider text-[9px] font-semibold">Real-world Codebase Example:</div>
+                <div className="leading-relaxed">{item.example}</div>
+              </div>
             </div>
           ))}
         </div>
