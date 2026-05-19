@@ -1,0 +1,13 @@
+{
+  "name": "budgetfit-tutorial-portal",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "build": "npm run build --prefix frontend"
+  }
+}

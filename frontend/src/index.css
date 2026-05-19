@@ -1,0 +1,163 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --ink-black: #0d1b2a;
+    --alabaster: #e0e1dd;
+    --lavender: #778da9;
+    --emerald-accent: #52b788;
+  }
+
+  * {
+    border-color: rgba(119, 141, 169, 0.2);
+  }
+
+  html, body {
+    @apply bg-inkBlack text-alabaster antialiased overflow-x-hidden;
+    background-image: radial-gradient(circle at 2px 2px, rgba(119, 141, 169, 0.08) 1px, transparent 0);
+    background-size: 40px 40px;
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-alabaster font-normal tracking-tight;
+  }
+
+  p {
+    @apply text-alabaster/90 leading-relaxed font-normal;
+  }
+
+  /* Custom Webkit Scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #0d1b2a;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #778da9;
+    border-radius: 2px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #e0e1dd;
+  }
+  ::selection {
+    background-color: #778da9;
+    color: #0d1b2a;
+  }
+}
+
+/* Minimalist Panel Utilities (Replacing Glassmorphism) */
+.glass-panel {
+  background: rgba(13, 27, 42, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(119, 141, 169, 0.2);
+  border-radius: 4px;
+}
+
+.glass-panel-glow {
+  background: rgba(13, 27, 42, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(82, 183, 136, 0.4);
+  box-shadow: 0 0 30px rgba(82, 183, 136, 0.1);
+  border-radius: 4px;
+}
+
+/* Hide scrollbars while preserving scroll */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* PrismJS Minimalist Dark Theme Override */
+code[class*="language-"],
+pre[class*="language-"] {
+  @apply font-mono text-xs text-alabaster bg-transparent;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+  line-height: 1.6;
+  tab-size: 4;
+  hyphens: none;
+}
+
+pre[class*="language-"] {
+  @apply p-4 my-2 rounded overflow-auto bg-[#0a1520] border border-lavender/20 shadow-inner;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: #778da9;
+  font-style: italic;
+}
+
+.token.punctuation {
+  color: #778da9;
+}
+
+.token.property,
+.token.tag,
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol,
+.token.deleted {
+  color: #e0e1dd;
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+  color: #52b788;
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string {
+  color: #778da9;
+}
+
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: #52b788;
+  font-weight: 500;
+}
+
+.token.function,
+.token.class-name {
+  color: #e0e1dd;
+  font-weight: 500;
+}
+
+.token.regex,
+.token.important,
+.token.variable {
+  color: #778da9;
+}
+
+.token.important,
+.token.bold {
+  font-weight: 500;
+}
+.token.italic {
+  font-style: italic;
+}

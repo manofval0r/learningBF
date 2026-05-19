@@ -1,0 +1,341 @@
+{
+  "projectTitle": "BudgetFit JavaFX Fintech Application",
+  "eli5Overview": {
+    "title": "What BudgetFit Actually Does (Plain English)",
+    "description": "BudgetFit is a desktop finance tracker that helps users manage their money, practice banking, and learn financial discipline. It is built using Java and stores its data in a local SQLite database.",
+    "coreFeatures": [
+      {
+        "name": "1. Income & Expense Tracker",
+        "description": "Users log their monthly paycheck and record daily expenses. The app categorizes spending (Groceries, Rent, Utilities) and shows exactly how much money is left to spend."
+      },
+      {
+        "name": "2. ATM Banking Simulator",
+        "description": "Simulates a real ATM where users can deposit virtual cash, withdraw money, or send peer-to-peer transfers to friends."
+      },
+      {
+        "name": "3. Step-Up Security PIN",
+        "description": "Just like a real physical ATM, BudgetFit pops up a security prompt asking for a 4-digit secret PIN before allowing any money to leave the account."
+      },
+      {
+        "name": "4. Virtual Investment Simulator",
+        "description": "Lets users buy and sell virtual stocks (like Apple or Tesla). It even simulates live stock market changes, making prices fluctuate up or down by 5%."
+      },
+      {
+        "name": "5. Savings Goals",
+        "description": "Helps users set target amounts for big purchases (like a new laptop or vacation) and tracks their saving progress over time."
+      }
+    ]
+  },
+  "tooltipDefinitions": {
+    "promptForPin": "Pops up a secure dialog box asking the user for their 4-digit ATM PIN before allowing a cash withdrawal or transfer.",
+    "calculateLeftToSpend": "A mathematical calculation that takes the user's monthly income, subtracts all expenses, and ensures the remaining balance never drops below zero.",
+    "BCrypt.checkpw": "A security check that compares the password entered by the user against the scrambled, encrypted password stored in the database.",
+    "PRAGMA foreign_keys": "A database rule that ensures transactions or investments are always linked to a valid, existing user account.",
+    "DriverManager.getConnection": "Establishes a direct connection between the Java application and the local SQLite database file (budgetfit.db).",
+    "loadTransactions": "Fetches all logged budget expenses from the database, filtering them so the user only sees transactions for the selected month.",
+    "simulateMarketFluctuations": "Randomly increases or decreases the current price of stock investments by up to 5% to simulate real-world stock market volatility.",
+    "switchView": "Dynamically swaps the current screen (e.g., from Dashboard to ATM) inside the main window area and applies the active light or dark theme.",
+    "verifyPin": "Checks the 4-digit PIN entered in the ATM security prompt against the encrypted PIN stored in the database.",
+    "conn.setAutoCommit": "Pauses automatic database saving so that multiple related changes (like deleting a user and all their transactions) happen together as a single package."
+  },
+  "overview": {
+    "title": "System Architecture & MVC Foundation",
+    "description": "BudgetFit is a robust desktop financial management application built on Java 17, JavaFX 17, and SQLite. It implements a clean Model-View-Controller (MVC) architecture paired with Data Access Objects (DAOs) to enforce strict separation of concerns.",
+    "layers": [
+      {
+        "name": "Presentation Layer (Views & Controllers)",
+        "details": "JavaFX FXML layouts define the visual hierarchy, while Java controllers handle user interactions, input validation, and Step-Up PIN authorization."
+      },
+      {
+        "name": "Service Layer (Business Logic)",
+        "details": "Encapsulates mathematical calculations, outflow aggregations, discretionary income clamping, and variance analysis entirely decoupled from UI threads."
+      },
+      {
+        "name": "Data Access Layer (DAOs)",
+        "details": "DAOs (UserDAO, TransactionDAO, InvestmentDAO, GoalDAO) abstract all JDBC interactions, providing clean CRUD methods scoped strictly by user ID."
+      },
+      {
+        "name": "Persistence Layer (SQLite)",
+        "details": "A local SQLite database (budgetfit.db) provisioned with PRAGMA foreign_keys = ON, automatic schema migrations, and BCrypt security hashing."
+      }
+    ],
+    "authFlow": "BudgetFit utilizes a two-tier authentication flow: standard username/password login via BCrypt verification, followed by Step-Up 4-digit PIN authorization for sensitive financial transactions (ATM withdrawals, P2P transfers)."
+  },
+  "mindmapNodes": [
+    {
+      "id": "mainapp",
+      "label": "MainApp & Launcher",
+      "group": "Core",
+      "x": 500,
+      "y": 120,
+      "representations": {
+        "diagram": "Launcher ──> MainApp.start() ──> DatabaseHelper.initializeDatabase() ──> Login Scene",
+        "text": "The primary entry point of the application. MainApp initializes the SQLite database tables and migrations via DatabaseHelper, then constructs the primary stage with the login.fxml view.",
+        "code": "public class MainApp extends Application {\n    @Override\n    public void start(Stage primaryStage) throws Exception {\n        DatabaseHelper.initializeDatabase();\n        FXMLLoader loader = new FXMLLoader(getClass().getResource(\"/fxml/login.fxml\"));\n        Scene scene = new Scene(loader.load(), 500, 500);\n        primaryStage.setTitle(\"BudgetFit\");\n        primaryStage.setScene(scene);\n        primaryStage.show();\n    }\n}"
+      }
+    },
+    {
+      "id": "dbhelper",
+      "label": "DatabaseHelper",
+      "group": "Database",
+      "x": 500,
+      "y": 280,
+      "representations": {
+        "diagram": "getConnection() ──> PRAGMA foreign_keys = ON ──> initializeDatabase() ──> Migrations & Seeding",
+        "text": "Manages JDBC connections to budgetfit.db. Automatically enforces foreign key constraints and executes robust ALTER TABLE schema migrations, BCrypt legacy password upgrades, and mock data seeding.",
+        "code": "public static Connection getConnection() throws SQLException {\n    Connection conn = DriverManager.getConnection(\"jdbc:sqlite:budgetfit.db\");\n    try (Statement stmt = conn.createStatement()) {\n        stmt.execute(\"PRAGMA foreign_keys = ON;\");\n    } catch (SQLException e) {}\n    return conn;\n}"
+      }
+    },
+    {
+      "id": "userdao",
+      "label": "UserDAO",
+      "group": "DAO",
+      "x": 250,
+      "y": 420,
+      "representations": {
+        "diagram": "authenticate() ──> BCrypt.checkpw() ──> UserSession.setCurrentUser()",
+        "text": "Abstracts user account verification, registration, and monthly income management. Implements verifyPin() for Step-Up ATM authorization.",
+        "code": "public static boolean verifyPin(int userId, String pin) {\n    // Fetches pin_hash and verifies against BCrypt.checkpw(pin, storedHash)\n}"
+      }
+    },
+    {
+      "id": "transactiondao",
+      "label": "TransactionDAO",
+      "group": "DAO",
+      "x": 400,
+      "y": 420,
+      "representations": {
+        "diagram": "loadTransactions(userId, month) ──> Filter by strftime('%Y-%m', date) ──> List<TransactionEntry>",
+        "text": "Handles persistence of user budget transactions and banking ledgers. Scopes all queries by user_id to guarantee data isolation.",
+        "code": "public static List<TransactionEntry> loadTransactions(int userId, String monthStr) {\n    // SELECT ... WHERE user_id = ? AND strftime('%Y-%m', date) = ?\n}"
+      }
+    },
+    {
+      "id": "investmentdao",
+      "label": "InvestmentDAO",
+      "group": "DAO",
+      "x": 580,
+      "y": 420,
+      "representations": {
+        "diagram": "buyInvestment() / sellInvestment() ──> simulateMarketFluctuations() (+/- 5%)",
+        "text": "Manages user stock/crypto investment portfolios. Includes simulateMarketFluctuations() to dynamically alter asset prices between -5% and +5% on each refresh.",
+        "code": "public static void simulateMarketFluctuations(int userId) {\n    // UPDATE investments SET current_price = current_price * factor WHERE id = ?\n}"
+      }
+    },
+    {
+      "id": "goaldao",
+      "label": "GoalDAO",
+      "group": "DAO",
+      "x": 750,
+      "y": 420,
+      "representations": {
+        "diagram": "getGoals() / insertGoal() / updateGoal() / deleteGoal()",
+        "text": "CRUD operations for user savings goals, tracking target amounts, current saved progress, and target completion dates.",
+        "code": "public static List<Goal> getGoals(int userId) {\n    // SELECT id, name, target_amount, current_amount, target_date FROM goals WHERE user_id = ?\n}"
+      }
+    },
+    {
+      "id": "budgetservice",
+      "label": "BudgetService",
+      "group": "Service",
+      "x": 350,
+      "y": 580,
+      "representations": {
+        "diagram": "calculateTotalBudget() / calculateTotalActual() ──> calculateLeftToSpend()",
+        "text": "Pure business logic layer. Sums budgeted and actual amounts while filtering out uncommitted placeholder rows. Clamps discretionary income to zero.",
+        "code": "public double calculateLeftToSpend(double monthlyIncome, double totalOutflow) {\n    return Math.max(monthlyIncome - totalOutflow, 0.0);\n}"
+      }
+    },
+    {
+      "id": "usersession",
+      "label": "UserSession",
+      "group": "Session",
+      "x": 700,
+      "y": 120,
+      "representations": {
+        "diagram": "setCurrentUser(id, name, role) ──> getUserId() / clear()",
+        "text": "Singleton-like static session container holding the currently authenticated user's ID, username, and role (user vs admin).",
+        "code": "public final class UserSession {\n    private static int userId = -1;\n    public static void setCurrentUser(int id, String name, String userRole) { ... }\n}"
+      }
+    },
+    {
+      "id": "dashboardctrl",
+      "label": "DashboardController",
+      "group": "Controller",
+      "x": 300,
+      "y": 280,
+      "representations": {
+        "diagram": "initialize() ──> loadTransactions() ──> populateTables() ──> handleThemeToggle()",
+        "text": "The master navigation hub. Manages the dynamic StackPane content area, sidebar toggling, theme switching broadcast, and interactive transaction ledger filtering.",
+        "code": "public void switchView(String fxmlFile) {\n    // Loads child FXML and dynamically injects dark-theme.css if darkModeBox.isSelected()\n}"
+      }
+    },
+    {
+      "id": "atmctrl",
+      "label": "AtmController",
+      "group": "Controller",
+      "x": 200,
+      "y": 580,
+      "representations": {
+        "diagram": "handleDeposit() / handleWithdrawal() / handleTransfer() ──> promptForPin() ──> TransactionDAO",
+        "text": "Manages ATM banking operations. Enforces 4-digit PIN verification via a TextInputDialog before executing any deposit, withdrawal, or peer-to-peer transfer.",
+        "code": "private boolean promptForPin(String actionName) {\n    // Shows dialog, calls UserDAO.verifyPin(UserSession.getUserId(), pin)\n}"
+      }
+    },
+    {
+      "id": "investctrl",
+      "label": "InvestmentController",
+      "group": "Controller",
+      "x": 650,
+      "y": 580,
+      "representations": {
+        "diagram": "refreshTable() ──> simulateMarketFluctuations() ──> updateChart()",
+        "text": "Controls the wealth management screen. Simulates market changes, calculates portfolio total equity, and displays holdings in a JavaFX TableView.",
+        "code": "public void handleBuyStock() {\n    // Validates inputs, calls InvestmentDAO.buyInvestment(), refreshes UI\n}"
+      }
+    },
+    {
+      "id": "adminctrl",
+      "label": "AdminController",
+      "group": "Controller",
+      "x": 800,
+      "y": 280,
+      "representations": {
+        "diagram": "loadUsers() ──> loadSystemLogs() ──> handleDeleteUser()",
+        "text": "Restricted administrative dashboard. Allows admins to inspect all registered users, view system audit logs, and perform cascading user deletions.",
+        "code": "public void handleDeleteUser() {\n    // Calls UserDAO.deleteUser(selectedId) which cascades deletes across 5 tables\n}"
+      }
+    }
+  ],
+  "mindmapConnections": [
+    { "source": "mainapp", "target": "dbhelper", "type": "Initializes SQLite" },
+    { "source": "mainapp", "target": "usersession", "type": "Initializes Session" },
+    { "source": "dashboardctrl", "target": "transactiondao", "type": "Fetches Ledger" },
+    { "source": "dashboardctrl", "target": "userdao", "type": "Fetches User Info" },
+    { "source": "dashboardctrl", "target": "budgetservice", "type": "Calculates Totals" },
+    { "source": "dashboardctrl", "target": "usersession", "type": "Reads Active User" },
+    { "source": "atmctrl", "target": "transactiondao", "type": "Executes Banking Tx" },
+    { "source": "atmctrl", "target": "userdao", "type": "Verifies PIN" },
+    { "source": "atmctrl", "target": "usersession", "type": "Reads Active User" },
+    { "source": "investctrl", "target": "investmentdao", "type": "Manages Portfolio" },
+    { "source": "investctrl", "target": "usersession", "type": "Reads Active User" },
+    { "source": "adminctrl", "target": "userdao", "type": "Manages Users" },
+    { "source": "userdao", "target": "dbhelper", "type": "Executes SQL" },
+    { "source": "transactiondao", "target": "dbhelper", "type": "Executes SQL" },
+    { "source": "investmentdao", "target": "dbhelper", "type": "Executes SQL" },
+    { "source": "goaldao", "target": "dbhelper", "type": "Executes SQL" }
+  ],
+  "codebaseFiles": [
+    {
+      "path": "com/budgetfit/database/DatabaseHelper.java",
+      "name": "DatabaseHelper.java",
+      "type": "java",
+      "summary": "Helper class for initializing and provisioning SQLite database connections. Enforces foreign key constraints and implements robust schema/data migrations.",
+      "technicalDepth": "Uses JDBC DriverManager to establish connection to 'jdbc:sqlite:budgetfit.db'. Executes 'PRAGMA foreign_keys = ON;' on connection creation. Contains initializeDatabase() which creates 5 tables (users, transactions, investments, system_logs, goals) and includes try-catch blocks for non-destructive ALTER TABLE column additions. Features migrateLegacySecurity() using BCrypt to automatically hash plaintext passwords/PINs.",
+      "code": "package com.budgetfit.database;\n\nimport org.mindrot.jbcrypt.BCrypt;\nimport java.sql.*;\nimport java.util.ArrayList;\nimport java.util.List;\n\npublic class DatabaseHelper {\n    private static final String DB_URL = \"jdbc:sqlite:budgetfit.db\";\n\n    public static Connection getConnection() throws SQLException {\n        Connection conn = DriverManager.getConnection(DB_URL);\n        try (Statement stmt = conn.createStatement()) {\n            stmt.execute(\"PRAGMA foreign_keys = ON;\");\n        } catch (SQLException e) {}\n        return conn;\n    }\n\n    public static void initializeDatabase() {\n        try (Connection conn = getConnection(); Statement stmt = conn.createStatement()) {\n            stmt.execute(\"CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT UNIQUE NOT NULL, password_hash TEXT NOT NULL, pin_hash TEXT NOT NULL DEFAULT '', role TEXT DEFAULT 'user', monthly_income REAL DEFAULT 5000.0, created_at DATETIME DEFAULT CURRENT_TIMESTAMP, last_active DATETIME DEFAULT CURRENT_TIMESTAMP);\");\n            stmt.execute(\"CREATE TABLE IF NOT EXISTS transactions (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, category TEXT NOT NULL, item_name TEXT NOT NULL, budgeted_amount REAL DEFAULT 0.0, actual_amount REAL DEFAULT 0.0, paid INTEGER DEFAULT 0, recurring INTEGER DEFAULT 0, sender_receiver TEXT DEFAULT '', tx_type TEXT DEFAULT 'BUDGET', date DATETIME DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(user_id) REFERENCES users(id));\");\n            stmt.execute(\"CREATE TABLE IF NOT EXISTS investments (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, symbol TEXT NOT NULL, shares REAL DEFAULT 0.0, avg_price REAL DEFAULT 0.0, current_price REAL DEFAULT 0.0, last_updated DATETIME DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(user_id) REFERENCES users(id));\");\n            stmt.execute(\"CREATE TABLE IF NOT EXISTS system_logs (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER, action TEXT NOT NULL, log_date DATETIME DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(user_id) REFERENCES users(id));\");\n            stmt.execute(\"CREATE TABLE IF NOT EXISTS goals (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, name TEXT NOT NULL, target_amount REAL NOT NULL, current_amount REAL DEFAULT 0.0, target_date TEXT DEFAULT '2026-12', FOREIGN KEY(user_id) REFERENCES users(id));\");\n            System.out.println(\"Database initialized successfully.\");\n        } catch (SQLException e) { e.printStackTrace(); }\n    }\n}"
+    },
+    {
+      "path": "com/budgetfit/dao/UserDAO.java",
+      "name": "UserDAO.java",
+      "type": "java",
+      "summary": "Data Access Object (DAO) providing clean abstractions for database interactions concerning user accounts, authentication, PIN verification, and user metadata.",
+      "technicalDepth": "Implements authenticate(username, password) which retrieves the user record and verifies the password against stored BCrypt hash using BCrypt.checkpw(). Implements verifyPin(userId, pin) for Step-Up ATM authorization. Implements deleteUser(userId) which uses manual transaction management (conn.setAutoCommit(false)) to perform cascading deletions across system_logs, transactions, investments, goals, and users before committing.",
+      "code": "package com.budgetfit.dao;\n\nimport com.budgetfit.database.DatabaseHelper;\nimport com.budgetfit.model.User;\nimport org.mindrot.jbcrypt.BCrypt;\nimport java.sql.*;\n\npublic class UserDAO {\n    public static User authenticate(String username, String password) {\n        try (Connection conn = DatabaseHelper.getConnection(); PreparedStatement stmt = conn.prepareStatement(\"SELECT id, username, password_hash, pin_hash, role, monthly_income, last_active FROM users WHERE username = ?\")) {\n            stmt.setString(1, username);\n            try (ResultSet rs = stmt.executeQuery()) {\n                if (rs.next()) {\n                    String storedHash = rs.getString(\"password_hash\");\n                    boolean matched = storedHash != null && storedHash.startsWith(\"$2a$\") ? BCrypt.checkpw(password, storedHash) : storedHash.equals(password);\n                    if (matched) return new User(rs.getInt(\"id\"), username, rs.getString(\"role\"), rs.getString(\"last_active\"), rs.getDouble(\"monthly_income\"), rs.getString(\"pin_hash\"));\n                }\n            }\n        } catch (SQLException e) { e.printStackTrace(); }\n        return null;\n    }\n\n    public static boolean verifyPin(int userId, String pin) {\n        try (Connection conn = DatabaseHelper.getConnection(); PreparedStatement stmt = conn.prepareStatement(\"SELECT pin_hash FROM users WHERE id = ?\")) {\n            stmt.setInt(1, userId);\n            try (ResultSet rs = stmt.executeQuery()) {\n                if (rs.next()) {\n                    String storedHash = rs.getString(\"pin_hash\");\n                    return storedHash != null && storedHash.startsWith(\"$2a$\") ? BCrypt.checkpw(pin, storedHash) : storedHash.equals(pin);\n                }\n            }\n        } catch (SQLException e) { e.printStackTrace(); }\n        return false;\n    }\n}"
+    },
+    {
+      "path": "com/budgetfit/dao/TransactionDAO.java",
+      "name": "TransactionDAO.java",
+      "type": "java",
+      "summary": "Data Access Object (DAO) managing transactions persistence. Guarantees data isolation by explicitly scoping updates and deletions by user_id.",
+      "technicalDepth": "Provides loadTransactions(userId, monthStr) which dynamically filters rows by strftime('%Y-%m', date). Implements copyRecurringTransactions(userId, targetMonthStr) which clones previous transactions marked with recurring = 1 into the target month if they do not already exist. Implements getMonthlySummaries() and getCategoryBreakdown() using advanced SQLite aggregation queries.",
+      "code": "package com.budgetfit.dao;\n\nimport com.budgetfit.database.DatabaseHelper;\nimport com.budgetfit.model.TransactionEntry;\nimport java.sql.*;\nimport java.util.*;\n\npublic class TransactionDAO {\n    public static List<TransactionEntry> loadTransactions(int userId, String monthStr) {\n        List<TransactionEntry> list = new ArrayList<>();\n        boolean filter = monthStr != null && !monthStr.equalsIgnoreCase(\"All Time\") && !monthStr.isEmpty();\n        String sql = \"SELECT id, category, item_name, budgeted_amount, actual_amount, paid, recurring, sender_receiver, tx_type, date FROM transactions WHERE user_id = ?\" + (filter ? \" AND strftime('%Y-%m', date) = ?\" : \"\") + \" ORDER BY id ASC\";\n        try (Connection conn = DatabaseHelper.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {\n            stmt.setInt(1, userId);\n            if (filter) stmt.setString(2, monthStr);\n            try (ResultSet rs = stmt.executeQuery()) {\n                while (rs.next()) list.add(new TransactionEntry(rs.getInt(\"id\"), rs.getString(\"category\"), rs.getString(\"item_name\"), rs.getDouble(\"budgeted_amount\"), rs.getDouble(\"actual_amount\"), rs.getInt(\"paid\") == 1, rs.getInt(\"recurring\") == 1, rs.getString(\"sender_receiver\"), rs.getString(\"tx_type\"), rs.getString(\"date\"), false));\n            }\n        } catch (SQLException e) { e.printStackTrace(); }\n        return list;\n    }\n}"
+    },
+    {
+      "path": "com/budgetfit/service/BudgetService.java",
+      "name": "BudgetService.java",
+      "type": "java",
+      "summary": "Service class encapsulating core business logic and mathematical calculations for budgeting, outflow aggregation, remaining income determination, and variance analysis.",
+      "technicalDepth": "Entirely decoupled from UI rendering threads to guarantee deterministic unit testability. Utilizes Java 8 Stream API (entries.stream().filter(entry -> !entry.isPlaceholder()).mapToDouble(...).sum()) to calculate totals. Implements calculateLeftToSpend() with Math.max(monthlyIncome - totalOutflow, 0.0) to clamp negative slices.",
+      "code": "package com.budgetfit.service;\n\nimport com.budgetfit.model.TransactionEntry;\nimport java.util.List;\n\npublic class BudgetService {\n    public double calculateTotalBudget(List<TransactionEntry> entries) {\n        return entries == null ? 0.0 : entries.stream().filter(e -> !e.isPlaceholder()).mapToDouble(TransactionEntry::getBudgetedAmount).sum();\n    }\n    public double calculateTotalActual(List<TransactionEntry> entries) {\n        return entries == null ? 0.0 : entries.stream().filter(e -> !e.isPlaceholder()).mapToDouble(TransactionEntry::getActualAmount).sum();\n    }\n    public double calculateLeftToSpend(double monthlyIncome, double totalOutflow) {\n        return Math.max(monthlyIncome - totalOutflow, 0.0);\n    }\n}"
+    },
+    {
+      "path": "com/budgetfit/controllers/AtmController.java",
+      "name": "AtmController.java",
+      "type": "java",
+      "summary": "Controller managing ATM banking operations (Deposit, Withdrawal, Peer-to-Peer Transfer). Enforces 4-digit PIN Step-Up authentication before executing any financial transaction.",
+      "technicalDepth": "Uses JavaFX @FXML annotations to bind UI components. Implements calculateAtmBalance() by iterating over banking ledger rows. Implements promptForPin() using TextInputDialog and UserDAO.verifyPin(). On successful transaction, calls DashboardController.getInstance().refreshAll() to broadcast state updates across sibling views.",
+      "code": "package com.budgetfit.controllers;\n\nimport com.budgetfit.dao.*;\nimport com.budgetfit.session.UserSession;\nimport javafx.fxml.FXML;\nimport javafx.scene.control.*;\nimport java.util.Optional;\n\npublic class AtmController {\n    @FXML private Label atmBalanceLabel;\n    @FXML private TextField depAmountField;\n\n    private boolean promptForPin(String actionName) {\n        TextInputDialog dialog = new TextInputDialog();\n        dialog.setTitle(\"PIN Verification Required\");\n        dialog.setHeaderText(\"Authorize \" + actionName);\n        dialog.setContentText(\"Please enter your 4-digit ATM PIN:\");\n        Optional<String> result = dialog.showAndWait();\n        return result.isPresent() && UserDAO.verifyPin(UserSession.getUserId(), result.get().trim());\n    }\n\n    @FXML private void handleDeposit() {\n        double amount = Double.parseDouble(depAmountField.getText().trim());\n        if (promptForPin(\"Cash Deposit of $\" + amount)) {\n            TransactionDAO.insertBankingTransaction(UserSession.getUserId(), \"Income\", \"Cash Deposit\", amount, \"ATM Deposit\", \"DEPOSIT\");\n            refreshBalance();\n        }\n    }\n}"
+    },
+    {
+      "path": "com/budgetfit/controllers/DashboardController.java",
+      "name": "DashboardController.java",
+      "type": "java",
+      "summary": "Central navigation hub, top-level StackPane contentArea, theme toggle broadcasting, currency/month selection, and the full Transaction Ledger view.",
+      "technicalDepth": "Implements switchView(fxmlFile) which loads child FXML layouts into contentArea. Resolves JavaFX CSS precedence traps by dynamically injecting dark-theme.css directly into the root scene, mainPane, AND every child Parent node inside contentArea whenever darkModeBox.isSelected() is true.",
+      "code": "package com.budgetfit.controllers;\n\nimport javafx.fxml.FXML;\nimport javafx.scene.layout.StackPane;\nimport javafx.scene.Parent;\n\npublic class DashboardController {\n    @FXML private StackPane contentArea;\n    @FXML private CheckBox darkModeBox;\n\n    public void switchView(String fxmlFile) {\n        try {\n            Parent root = FXMLLoader.load(getClass().getResource(fxmlFile));\n            if (darkModeBox.isSelected()) {\n                root.getStylesheets().add(getClass().getResource(\"/css/dark-theme.css\").toExternalForm());\n            }\n            contentArea.getChildren().setAll(root);\n        } catch (Exception e) { e.printStackTrace(); }\n    }\n}"
+    }
+  ],
+  "projectHistory": {
+    "title": "BudgetFit: Historical Evolution & Architectural Lessons",
+    "subtitle": "From a basic desktop MVP to an enterprise-grade financial dashboard featuring dual-theme design systems and interactive mock persistence.",
+    "phases": [
+      {
+        "phase": "Phase 1: Genesis & Basic Desktop MVP",
+        "date": "Initial Commit",
+        "description": "Established SQLite (budgetfit.db) as the persistent mock database layer using JDBC. Created core DAOs (TransactionDAO, UserDAO) and base FXML layouts (dashboard.fxml, atm.fxml, investments.fxml, admin.fxml). Utilized standard JavaFX UI controls (Modena theme) and separate window controllers."
+      },
+      {
+        "phase": "Phase 2: Bento Warm Light Mode Redesign",
+        "date": "UI Modernization",
+        "description": "Modernized the UI to match top-tier fintech web platforms (Spenmo, Ramp, Apple Card) with a clean, welcoming light aesthetic. Introduced a curated HSL color token system in styles.css (--bf-bg-page: #faf7f2, --bf-bg-card: #ffffff). Stripped default JavaFX chart chrome in favor of custom UI overlays, bento-box stat containers (.bento-stat-card), and dynamic SVG sparklines."
+      },
+      {
+        "phase": "Phase 3: Zebec V2 Dark Mode Overhaul & Corrective Pivot",
+        "date": "Theming Overhaul",
+        "description": "Attempted to implement a premium site-wide 'Zebec V2' dark luxury aesthetic. However, toggling dark mode initially only turned input boxes black, and atm.fxml was accidentally hardcoded to dark mode by default. We executed a strategic pivot to restore atm.fxml back to the pristine Bento Warm light mode default, ensuring structural parity while reserving the dark luxury palette strictly for the runtime override stylesheet (dark-theme.css)."
+      },
+      {
+        "phase": "Phase 4: Architectural Theming Precedence Fix",
+        "date": "Precedence Resolution",
+        "description": "Discovered a major JavaFX CSS precedence trap: stylesheets attached directly to child Parent containers (stylesheets='@/css/styles.css') take higher precedence than stylesheets attached to the root Scene. Supercharged DashboardController.handleThemeToggle() and switchView() to dynamically inject dark-theme.css directly into scene, mainPane, AND every child Parent node inside contentArea."
+      },
+      {
+        "phase": "Phase 5: Interactive Ledger & App Activation",
+        "date": "Living Application",
+        "description": "Transformed static UI placeholders into a fully interactive, living application. Converted static category tabs into clickable filters that dynamically update ledgerTable via TransactionDAO. Added live sorting, interactive ChoiceDialog filters, real-time text searching, and pre-populated TextInputDialog prompts."
+      }
+    ],
+    "architecturalPivots": [
+      {
+        "title": "Dual-Path Styling System",
+        "description": "Instead of maintaining separate FXML files for light and dark modes, BudgetFit utilizes a unified FXML structure paired with a dual-path CSS architecture: Base (styles.css) defines structural layout rules and default light mode colors, while Master Override (dark-theme.css) cleanly replaces background fills, text fills, and border accents without altering layout geometry."
+      },
+      {
+        "title": "Decoupling Structure from Theme Tokens",
+        "description": "During the ATM light mode restoration, cards appeared squished because the .card class lacked padding (previously bundled inside .card-dark). Established the architectural rule that layout geometry (padding, margins, spacing) must be decoupled from theme color classes. Introduced .card-padded and .sub-card to ensure containers maintain perfect dimensions regardless of the active color theme."
+      }
+    ],
+    "regressionPrevention": [
+      {
+        "title": "1. JavaFX CSS Hierarchy & Precedence Traps",
+        "pitfall": "Adding a theme stylesheet to scene.getStylesheets().add(...) will fail to style child FXML files if those files declare stylesheets='@/css/styles.css' on their root nodes.",
+        "prevention": "Always broadcast dynamic stylesheet changes across the scene graph hierarchy. When loading new sub-views in switchView(), explicitly check the state of the theme toggle and attach the override stylesheet to the newly loaded Parent node before rendering."
+      },
+      {
+        "title": "2. FXMLLoader Exceptions & Attribute Mismatches",
+        "pitfall": "Using CSS shorthands or web-based attributes in FXML (e.g., -fx-margin, prefWidth='MAX_VALUE') causes fatal LoadExceptions during FXMLLoader.load().",
+        "prevention": "FXML is strictly typed against the JavaFX API. Use maxWidth='Infinity' instead of MAX_VALUE. Use HBox.hgrow='ALWAYS' or VBox.margin instead of CSS margin properties."
+      },
+      {
+        "title": "3. XML Syntax Corruption",
+        "pitfall": "Manual edits to FXML files can occasionally introduce stray characters (e.g., </HBox>*), resulting in fatal SAXParseExceptions at runtime.",
+        "prevention": "Maintain strict XML compliance. Utilize IDE XML validators and ensure closing tags are pristine before running Maven builds."
+      },
+      {
+        "title": "4. Redundant UI Data Formatting",
+        "pitfall": "Hardcoding static decimal labels next to dynamic currency labels creates broken, unformatted strings ($4,000.00.02213) when backend formatters update.",
+        "prevention": "Rely entirely on Java NumberFormat or custom cell factories (TableCell) for currency formatting. Eliminate static decimal decorations in FXML."
+      }
+    ]
+  }
+}
