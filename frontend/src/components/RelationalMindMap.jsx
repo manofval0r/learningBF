@@ -9,7 +9,12 @@ export default function RelationalMindMap({ annotations }) {
   const [zoomLevel, setZoomLevel] = useState(1);
   const canvasRef = useRef(null);
 
-  const nodes = annotations?.mindmapNodes || [];
+  const rawNodes = annotations?.mindmapNodes || [];
+  const nodes = rawNodes.map(node => ({
+    ...node,
+    x: 700 + (node.x - 500) * 1.8,
+    y: 100 + (node.y - 120) * 1.6
+  }));
   const connections = annotations?.mindmapConnections || [];
 
   const groups = ['All', 'Core', 'Controller', 'DAO', 'Service', 'Database'];
@@ -126,7 +131,7 @@ export default function RelationalMindMap({ annotations }) {
           
           {/* Interactive Mind Map Graph Container */}
           <div 
-            className="relative w-[1000px] h-[650px] mx-auto transition-transform duration-300 origin-center"
+            className="relative w-[1400px] h-[950px] mx-auto transition-transform duration-300 origin-center"
             style={{ transform: `scale(${zoomLevel})` }}
           >
             {/* SVG Connection Lines */}
