@@ -14,29 +14,29 @@ export default function ProjectHistory({ annotations }) {
   // Curated OOP & Java concepts applied in the project
   const javaConcepts = [
     {
-      concept: "Inheritance & Polymorphism",
-      explanation: "Creating parent-child class relationships to reuse layout structures and define generic interfaces for UI components.",
-      example: "UI controllers (e.g. AtmController) implement JavaFX's Initializable interface, allowing the navigation framework to initialize them polymorphically. Custom errors extend the base Exception class."
+      concept: "Inheritance & Polymorphism (Parent & Child blueprint)",
+      explanation: "ELI5 Analogy: A blueprint for Vehicles. Just like a Sports Car and a School Bus are both 'Vehicles' that inherit wheels and an engine, different screens in BudgetFit (like the ATM or Investments screen) are both 'Initializable Screens'. They share the same basic setup rules so the main dashboard can open them all the same way.",
+      example: "AtmController implements JavaFX's Initializable interface, allowing the navigation manager to initialize all sub-screens using a single generic rule."
     },
     {
-      concept: "Exception Handling (Try-Catch-Finally)",
-      explanation: "Intercepting run-time exceptions (e.g. database locks or missing files) gracefully to prevent application crashes.",
-      example: "Surrounding JDBC statements with try-catch blocks to capture SQLException, displaying user-friendly JavaFX Alert modals, and using try-with-resources to automatically close connections."
+      concept: "Exception Handling (Safety Nets)",
+      explanation: "ELI5 Analogy: A Safety Net. If you are juggling balls (running code) and drop one (like a database error or missing file), a safety net catches it before it hits the floor. The app doesn't crash; it just handles the mistake safely and tells the user what went wrong.",
+      example: "Using try-catch blocks to catch SQLException when loading data from SQLite, popping up a helpful warning dialog instead of crashing the program."
     },
     {
-      concept: "The Singleton Design Pattern",
-      explanation: "Enforcing that a class has exactly one active instance in the application memory and providing a global access point.",
-      example: "DashboardController maintains a static instance field and exposing DashboardController.getInstance() so that child views (like AtmController) can trigger main view refreshes."
+      concept: "The Singleton Pattern (One Single Instance)",
+      explanation: "ELI5 Analogy: The President of a Country. A country only has exactly one active President. If anyone wants to make a national decision, they talk to that single president. Similarly, there is only ever one active Dashboard screen running in the app's memory.",
+      example: "DashboardController.getInstance() allows child sub-views (like AtmController) to find and talk to the single running dashboard to refresh the UI."
     },
     {
-      concept: "Encapsulation & Scope Accessors",
-      explanation: "Restricting direct access to an object's internal data fields to protect state integrity, using private scopes.",
-      example: "Data models like TransactionEntry hide fields behind private access modifiers, exposing changes exclusively via public getters (getActualAmount()) and setters (setPaid())."
+      concept: "Encapsulation (A Piggy Bank with a Slot)",
+      explanation: "ELI5 Analogy: A Locked Piggy Bank. You cannot reach inside the bank directly to grab or mess with the coins (private variables). You can only slide money in through the slot, or ask the owner to read the counter (public getters and setters). This keeps the internal values safe.",
+      example: "TransactionEntry stores values in private variables, exposing them safely through public getter/setter methods like getActualAmount()."
     },
     {
-      concept: "Static Modifiers vs. Object Instances",
-      explanation: "Decoupling utility functions from object state. Static methods attach to the class blueprint rather than memory instances.",
-      example: "DataAccessObjects like UserDAO use static helper methods (UserDAO.verifyPin()) since they are stateless, whereas BudgetService must be instantiated as an object to calculate specific users' stream states."
+      concept: "Static Modifiers vs. Object Instances (Calculator vs. Spreadsheet)",
+      explanation: "ELI5 Analogy: A Calculator vs. a personal Spreadsheet. A calculator is static — anyone can use it to add numbers without needing to configure it first. A spreadsheet is an instance — you must create a new, separate spreadsheet page for each user to track their specific monthly budget.",
+      example: "Stateless database checks like UserDAO.verifyPin() are static (callable anytime), whereas BudgetService must be created as a new instance specifically for the logged-in user."
     }
   ];
 
