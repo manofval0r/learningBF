@@ -73,7 +73,8 @@ export default function App() {
           </div>
 
           <div className="text-xs font-mono text-lavender border border-lavender/20 px-4 py-2 rounded bg-inkBlack shadow-inner">
-            Designed by <span className="text-emeraldAccent font-medium">Antigravity</span>
+            Created with <span className="text-emeraldAccent font-medium">Antigravity</span>
+            Developed by <span className="text-emeraldAccent font-medium">Group 7</span>
           </div>
         </div>
       </footer>
