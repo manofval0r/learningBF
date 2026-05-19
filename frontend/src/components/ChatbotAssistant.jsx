@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { BotMessageSquare, Send, User, Sparkles, RefreshCw, Cpu, AlertCircle } from 'lucide-react';
 import Prism from 'prismjs';
+import { marked } from 'marked';
 
 export default function ChatbotAssistant() {
   const [messages, setMessages] = useState([
@@ -120,9 +121,16 @@ export default function ChatbotAssistant() {
                   </div>
                 )}
 
-                <div className="prose prose-invert max-w-none text-xs sm:text-sm leading-relaxed space-y-4 font-mono whitespace-pre-wrap">
-                  {msg.text}
-                </div>
+                {isAI ? (
+                  <div 
+                    className="markdown-content text-xs sm:text-sm"
+                    dangerouslySetInnerHTML={{ __html: marked.parse(msg.text) }}
+                  />
+                ) : (
+                  <div className="text-xs sm:text-sm font-mono whitespace-pre-wrap">
+                    {msg.text}
+                  </div>
+                )}
 
               </div>
 

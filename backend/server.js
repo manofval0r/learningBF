@@ -108,7 +108,7 @@ async function callOpenRouterAI(userMessage) {
   }
 
   const response = await axios.post("https://openrouter.ai/api/v1/chat/completions", {
-    model: "google/gemini-2.5-flash:free",
+    model: "openrouter/free",
     messages: [
       { role: "system", content: SYSTEM_PROMPT },
       { role: "user", content: userMessage }

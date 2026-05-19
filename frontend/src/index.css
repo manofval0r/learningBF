@@ -154,10 +154,41 @@ pre[class*="language-"] {
   color: #778da9;
 }
 
-.token.important,
 .token.bold {
   font-weight: 500;
 }
 .token.italic {
   font-style: italic;
+}
+
+/* Markdown Content Renderer Styling */
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3,
+.markdown-content h4 {
+  @apply font-mono font-medium text-alabaster mt-5 mb-2.5;
+}
+.markdown-content h1 { @apply text-base; }
+.markdown-content h2 { @apply text-sm border-b border-lavender/20 pb-1.5; }
+.markdown-content h3 { @apply text-xs uppercase tracking-wider text-emeraldAccent; }
+.markdown-content p {
+  @apply font-mono text-xs sm:text-sm text-lavender/90 mb-4 leading-relaxed;
+}
+.markdown-content ul {
+  @apply list-disc list-inside font-mono text-xs sm:text-sm text-lavender/90 mb-4 pl-2.5 space-y-1;
+}
+.markdown-content ol {
+  @apply list-decimal list-inside font-mono text-xs sm:text-sm text-lavender/90 mb-4 pl-2.5 space-y-1;
+}
+.markdown-content li {
+  @apply mb-1;
+}
+.markdown-content code {
+  @apply font-mono text-xs text-emeraldAccent bg-[#0a1520] px-1.5 py-0.5 rounded border border-lavender/10;
+}
+.markdown-content pre {
+  @apply my-4 p-4 rounded overflow-auto bg-[#0a1520] border border-lavender/20 shadow-inner;
+}
+.markdown-content pre code {
+  @apply p-0 bg-transparent border-0 text-alabaster;
 }
