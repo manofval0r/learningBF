@@ -139,6 +139,34 @@ export default function SystemOverview({ setActiveTab, annotations }) {
         </div>
       </div>
 
+      {/* Team & Members Section */}
+      <div className="bg-[#0a1520] p-8 sm:p-10 rounded border border-lavender/20 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 shadow-sm">
+        <div>
+          <h3 className="text-xl sm:text-2xl font-normal tracking-tight text-alabaster mb-2">
+            Development Team
+          </h3>
+          <p className="text-xs text-lavender font-mono">
+            Designing & engineering the BudgetFit architecture portal.
+          </p>
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 bg-inkBlack p-6 rounded border border-lavender/10 w-full md:w-auto">
+          <div>
+            <div className="text-[10px] font-mono text-emeraldAccent uppercase tracking-widest mb-1.5 font-semibold">Group</div>
+            <div className="text-sm font-mono font-medium text-alabaster">Group 7</div>
+          </div>
+          <div className="hidden sm:block w-[1px] bg-lavender/20 self-stretch" />
+          <div>
+            <div className="text-[10px] font-mono text-emeraldAccent uppercase tracking-widest mb-1.5 font-semibold">Team Members</div>
+            <ul className="text-xs font-mono text-lavender space-y-1">
+              <li>Kamsiyochuckwu Ezeonu</li>
+              <li>Abiodun Lateef</li>
+              <li>David Idowu</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
     </div>
   );
 }
